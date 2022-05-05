@@ -50,7 +50,7 @@ To see the changes in action, run this command in a new terminal
 
 ```bash
 docker run --tty \
---network postgres-docker_default \
+--network postgres_kafka_default \
 confluentinc/cp-kafkacat \
 kafkacat -b kafka:9092 -C \
 -s key=s -s value=avro \
