@@ -1,0 +1,71 @@
+services:
+  materialized:
+    image: materialize/materialized:v0.26.0
+    ports:
+      - 6875:6875
+    healthcheck: {test: curl -f localhost:6875, interval: 1s, start_period: 30s}
+
+  postgres:
+    image: debezium/postgres:13
+    ports:
+      - 5432:5432
+    healthcheck:
+      test: "pg_isready -U postgresuser -d inventory_db"
+      interval: 2s
+      timeout: 20s
+      retries: 10
+    environment:
+      - POSTGRES_USER=postgresuser
+      - POSTGRES_PASSWORD=postgrespw
+      - POSTGRES_DB=inventory_db
+      - PGPASSWORD=postgrespw
+    volumes:
+      - ./scripts:/docker-entrypoint-initdb.d
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.0.1
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+    healthcheck: { test: nc -z localhost 2181, interval: 1s, start_period: 120s }
+
+  kafka:
+    image: confluentinc/cp-enterprise-kafka:7.0.1
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    ports:
+      - 9092:9092
+    depends_on:
+      zookeeper: { condition: service_healthy }
+    healthcheck: { test: nc -z localhost 9092, interval: 1s, start_period: 120s }
+
+  schema-registry:
+    image: confluentinc/cp-schema-registry:7.0.1
+    environment:
+      - SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS=kafka:9092
+      - SCHEMA_REGISTRY_HOST_NAME=schema-registry
+      - SCHEMA_REGISTRY_LISTENERS=http://schema-registry:8081,http://localhost:8081
+    depends_on:
+      zookeeper: { condition: service_healthy }
+      kafka: { condition: service_healthy }
+    healthcheck: { test: curl -f localhost:8081, interval: 1s, start_period: 120s }
+
+  debezium:
+    platform: linux/x86_64
+    image: debezium/connect:1.8
+    environment:
+      BOOTSTRAP_SERVERS: kafka:9092
+      GROUP_ID: 1
+      CONFIG_STORAGE_TOPIC: connect_configs
+      OFFSET_STORAGE_TOPIC: connect_offsets
+      KEY_CONVERTER: io.confluent.connect.avro.AvroConverter
+      VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
+      CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
+      CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
+    ports:
+      - 8083:8083
+    healthcheck: {test: curl -f localhost:8083, interval: 1s, start_period: 120s}
+    depends_on:
+      kafka: {condition: service_healthy}
+      postgres: {condition: service_healthy}
