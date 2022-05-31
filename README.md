@@ -2,7 +2,7 @@
 # Streaming data from postgres into kafka using debezium
 ## Run Locally
 
-1. Clone the project
+1. Clone the project 
 
 ```bash
   git clone https://github.com/CliffLolo/postgres_kafka.git
