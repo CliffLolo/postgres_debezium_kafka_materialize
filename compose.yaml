@@ -69,3 +69,12 @@ services:
     depends_on:
       kafka: {condition: service_healthy}
       postgres: {condition: service_healthy}
+
+  metabase:
+    platform: linux/amd64
+    image: metabase/metabase:v0.41.5
+    depends_on: [ materialized ]
+    ports:
+      - 3030:3000
+  cli:
+    image: materialize/cli:v0.26.0
