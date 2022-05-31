@@ -1,5 +1,5 @@
 
-# Streaming data from postgres into kafka using debezium
+# Event stream processing using Postgres + Debezium + Kafka + Materialize + Metabase
 ## Run Locally
 
 1. Clone the project 
