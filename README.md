@@ -1,5 +1,7 @@
 
 # Event stream processing using Postgres + Debezium + Kafka + Materialize + Metabase
+![demo_pic](/uploads/45cf9f6389ed17695a144cf07657ec6f/demo_pic.png)
+
 ## Run Locally
 
 1. Clone the project 
