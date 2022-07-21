@@ -1,6 +1,6 @@
 
 # Event stream processing using Postgres + Debezium + Kafka + Materialize + Metabase
-<img width="519" alt="demo_pic" src="https://user-images.githubusercontent.com/41656028/171788281-5f9831fa-9f4e-4c00-a749-08a38c23e52a.png">
+![Image 7-21-22 at 6 01 PM](https://user-images.githubusercontent.com/41656028/180283053-b89954f2-5f27-41e9-9e69-961089418039.jpg)
 
 ## Run Locally
 
